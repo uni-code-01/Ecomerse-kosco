@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tienda de Frutas</title>
+  <style>
+    :root {
+      --primary-color: #2d7a2f;
+      --secondary-color: #ffffff;
+      --dark-bg: #1e1e1e;
+      --light-gray: #f5f5f5;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--secondary-color);
+      color: #333;
+    }
+
+    header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 1rem;
+      font-weight: bold;
+    }
+
+    .search-cart {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-cart input[type="text"] {
+      padding: 0.4rem 0.6rem;
+      border-radius: 20px;
+      border: none;
+    }
+
+    .cart-icon-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .cart-count {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background-color: red;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cart-dropdown {
+      position: absolute;
+      top: 60px;
+      right: 2rem;
+      background: white;
+      color: black;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      max-width: 300px;
+      width: 100%;
+      padding: 1rem;
+      display: none;
+      flex-direction: column;
+      z-index: 999;
+    }
+
+    .cart-dropdown.show {
+      display: flex;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .cart-item span {
+      flex: 1 1 100px;
+      text-align: left;
+    }
+
+    .cart-item button.remove {
+      background-color: transparent;
+      border: none;
+      color: red;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-left: 10px;
+      padding: 0.2rem 0.5rem;
+    }
+
+    .cart-total {
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+
+    .cart-actions {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .cart-actions button {
+      flex: 1;
+      padding: 0.5rem;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close-cart {
+      background-color: #ccc;
+      color: black;
+    }
+
+    .buy-cart {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .hero {
+      background: linear-gradient(to right, var(--primary-color), #3e9f41);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+
+    .hero h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    .hero button {
+      background-color: white;
+      color: var(--primary-color);
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 30px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .hero button:hover {
+      background-color: #e0ffe0;
+    }
+
+    .categories {
+      background-color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .category-btn {
+      padding: 0.5rem 1rem;
+      border-radius: 30px;
+      border: none;
+      cursor: pointer;
+      background-color: #ddd;
+      color: #333;
+      transition: background-color 0.3s ease;
+    }
+
+    .category-btn.active {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .product-card {
+      background-color: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .product-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .product-info {
+      padding: 1rem;
+    }
+
+    .product-name {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .product-price {
+      color: var(--primary-color);
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .product-card button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 30px;
+      cursor: pointer;
+      width: 100%;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    .product-card button:hover {
+      background-color: #1f5b20;
+    }
+
+    /* Contact Section */
+    .contact-section {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+
+    .contact-section img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 1rem;
+      border: 3px solid white;
+    }
+
+    .contact-section h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .contact-section p {
+      font-size: 1rem;
+      max-width: 600px;
+      margin: 0 auto 1rem;
+    }
+
+    .social-links a {
+      color: white;
+      margin: 0 10px;
+      font-size: 1.2rem;
+      text-decoration: none;
+    }
+
+    .social-links a:hover {
+      text-decoration: underline;
+    }
+
+    /* Footer */
+    footer {
+      background-color: var(--dark-bg);
+      color: white;
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    footer h3 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    footer p {
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .search-cart {
+        width: 100%;
+        justify-content: center;
+        margin-top: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Frutas Frescas</h1>
+  <div class="search-cart">
+    <nav>
+      <a href="#products">Productos</a>
+      <a href="#contact">Contacto</a>
+    </nav>
+    <input type="text" id="searchInput" placeholder="Buscar..." />
+    <button class="cart-icon-btn" onclick="toggleCart()">
+      🛒
+      <span class="cart-count" id="cartCount">0</span>
+    </button>
+    <!-- Dropdown del carrito -->
+    <div class="cart-dropdown" id="cartDropdown">
+      <h3>Carrito</h3>
+      <div id="cartItems"></div>
+      <div class="cart-total">
+        <p>Subtotal: Bs<span id="subtotal">0.00</span></p>
+        <p>Total: Bs<span id="total">0.00</span></p>
+      </div>
+      <div class="cart-actions">
+        <button class="close-cart" onclick="toggleCart()">Cerrar</button>
+        <button class="buy-cart" onclick="sendCartToWhatsApp()">Comprar</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <h2>¡Frutas frescas diariamente!</h2>
+  <p>Entrega rápida y productos de la mejor calidad para tu salud y bienestar.</p>
+  <button onclick="scrollToProducts()">Ver productos</button>
+</section>
+
+<div class="categories">
+  <button class="category-btn active" data-category="all">Mostrar todo</button>
+  <button class="category-btn" data-category="frutas">Frutas</button>
+  <button class="category-btn" data-category="verduras">Verduras</button>
+  <button class="category-btn" data-category="comestibles">Comestibles</button>
+</div>
+
+<section class="products" id="products"></section>
+
+<!-- Sección de contacto -->
+<section class="contact-section" id="contact">
+  <img src="https://placehold.co/120x120?text=Nosotros" alt="Nosotros" />
+  <h2>Contacto</h2>
+  <p>Somos una empresa dedicada a la venta de frutas, verduras y comestibles frescos y naturales. Contamos con entrega rápida y productos de alta calidad.</p>
+  <div class="social-links">
+    <a href="#">📞 +123 456 7890</a> |
+    <a href="#">✉️ contacto@frutasfrescas.com</a> |
+    <a href="#">📍 Ciudad Natural, Calle Frutal 123</a>
+  </div>
+</section>
+
+<footer>
+  <h3>Frutas Frescas</h3>
+  <p>&copy; 2025 Todos los derechos reservados.</p>
+  <p>Entregas en toda la ciudad | Pagos seguros | Soporte 24/7</p>
+</footer>
+
+<script>
+  const products = [
+    { id: 1, name: "Manzana", price: 2.99, category: "frutas" },
+    { id: 2, name: "Plátano", price: 1.49, category: "frutas" },
+    { id: 3, name: "Naranja", price: 3.19, category: "frutas" },
+    { id: 4, name: "Zanahoria", price: 1.20, category: "verduras" },
+    { id: 5, name: "Lechuga", price: 0.99, category: "verduras" },
+    { id: 6, name: "Tomate", price: 1.10, category: "verduras" },
+    { id: 7, name: "Arroz", price: 2.50, category: "comestibles" },
+    { id: 8, name: "Fideos", price: 1.80, category: "comestibles" },
+    { id: 9, name: "Aceite", price: 3.00, category: "comestibles" },
+  ];
+
+  let cart = [];
+
+  const productsContainer = document.getElementById("products");
+  const cartItemsContainer = document.getElementById("cartItems");
+  const cartCountElement = document.getElementById("cartCount");
+  const subtotalElement = document.getElementById("subtotal");
+  const totalElement = document.getElementById("total");
+  const searchInput = document.getElementById("searchInput");
+
+  function renderProducts() {
+    const activeCategory = document.querySelector(".category-btn.active").dataset.category;
+    const searchTerm = searchInput.value.toLowerCase();
+    productsContainer.innerHTML = "";
+
+    products
+      .filter(p => (activeCategory === "all" || p.category === activeCategory) && p.name.toLowerCase().includes(searchTerm))
+      .forEach(product => {
+        const productCard = document.createElement("div");
+        productCard.className = "product-card";
+        productCard.innerHTML = `
+          <img src=" https://placehold.co/300x200?text=${product.name}" alt="${product.name}">
+          <div class="product-info">
+            <div class="product-name">${product.name}</div>
+            <div class="product-price">Bs${product.price.toFixed(2)}</div>
+            <button onclick='addToCart(${JSON.stringify(product)})'>Añadir al carrito</button>
+          </div>
+        `;
+        productsContainer.appendChild(productCard);
+      });
+  }
+
+  function addToCart(product) {
+    const existingItem = cart.find(item => item.id === product.id);
+
+    if (existingItem) {
+      existingItem.quantity += 1;
+    } else {
+      cart.push({ ...product, quantity: 1 });
+    }
+
+    updateCart();
+  }
+
+  function removeFromCart(index) {
+    const item = cart[index];
+    if (item.quantity > 1) {
+      item.quantity -= 1;
+    } else {
+      cart.splice(index, 1); // Eliminar si es 1
+    }
+    updateCart();
+  }
+
+  function updateCart() {
+    cartItemsContainer.innerHTML = "";
+    let subtotal = 0;
+
+    cart.forEach((item, index) => {
+      subtotal += item.price * item.quantity;
+      const itemDiv = document.createElement("div");
+      itemDiv.className = "cart-item";
+      itemDiv.innerHTML = `
+        <span>${item.name} x${item.quantity}</span>
+        <span>Bs${(item.price * item.quantity).toFixed(2)}</span>
+        <button class="remove" onclick="removeFromCart(${index})">Quitar</button>
+      `;
+      cartItemsContainer.appendChild(itemDiv);
+    });
+
+    subtotalElement.textContent = subtotal.toFixed(2);
+    totalElement.textContent = subtotal.toFixed(2);
+    cartCountElement.textContent = cart.length;
+  }
+
+  function sendCartToWhatsApp() {
+    if (cart.length === 0) {
+      alert("El carrito está vacío.");
+      return;
+    }
+
+    let message = "Hola, estoy interesado en los siguientes productos:\n\n";
+    cart.forEach(item => {
+      message += `- ${item.name} x${item.quantity} (Bs${(item.price * item.quantity).toFixed(2)})\n`;
+    });
+
+    message += `\nTotal: Bs${cart.reduce((sum, i) => sum + i.price * i.quantity, 0).toFixed(2)}`;
+    const encodedMessage = encodeURIComponent(message);
+    window.open(` https://wa.me/?text=${encodedMessage}`, "_blank");
+  }
+
+  function toggleCart() {
+    const cartDropdown = document.getElementById("cartDropdown");
+    cartDropdown.classList.toggle("show");
+  }
+
+  function scrollToProducts() {
+    document.getElementById("products").scrollIntoView({ behavior: "smooth" });
+  }
+
+  // Event listeners
+  document.querySelectorAll(".category-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderProducts();
+    });
+  });
+
+  searchInput.addEventListener("input", renderProducts);
+
+  // Initial rendering
+  renderProducts();
+</script>
+
+</body>
+</html>
